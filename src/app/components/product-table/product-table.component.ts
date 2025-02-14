@@ -43,6 +43,63 @@ export class ProductTableComponent implements OnInit {
 
   ngOnInit(): void {
     this.isLoading = true;
+
+    // Add default products if none exist
+    const defaultProducts: Product[] = [
+      {
+        id: 1,
+        name: 'Laptop',
+        price: 999.99,
+        quantity: 10,
+        category: 'Electronics',
+        description: 'High-performance laptop with latest specifications',
+      },
+      {
+        id: 2,
+        name: 'Smartphone',
+        price: 599.99,
+        quantity: 15,
+        category: 'Electronics',
+        description: 'Latest model smartphone with advanced features',
+      },
+      {
+        id: 3,
+        name: 'Headphones',
+        price: 199.99,
+        quantity: 20,
+        category: 'Accessories',
+        description: 'Wireless noise-canceling headphones',
+      },
+      {
+        id: 4,
+        name: 'Smart Watch',
+        price: 299.99,
+        quantity: 12,
+        category: 'Wearables',
+        description: 'Fitness tracking and health monitoring smartwatch',
+      },
+    ];
+
+    this.productService.getProducts().subscribe({
+      next: (products) => {
+        // If no products exist, add default ones
+        if (products.length === 0) {
+          defaultProducts.forEach((product) => {
+            this.productService.addProduct(product);
+          });
+          this.products = defaultProducts;
+        } else {
+          this.products = products;
+        }
+        this.isLoading = false;
+      },
+      error: (err) => {
+        this.error = 'Failed to load products';
+        this.isLoading = false;
+        console.error('Error loading products:', err);
+      },
+    });
+
     this.productService.getProducts().subscribe({
       next: (products) => {
         this.products = products;
