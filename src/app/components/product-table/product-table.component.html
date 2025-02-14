@@ -1,0 +1,86 @@
+<div class="container">
+  <h2>Product Management</h2>
+
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="product-form">
+    <div class="form-group">
+      <label for="name">Name:</label>
+      <input
+        id="name"
+        type="text"
+        formControlName="name"
+        [class.invalid]="isFieldInvalid('name')"
+      />
+      <div class="error-message" *ngIf="isFieldInvalid('name')">
+        Name is required and must be at least 3 characters
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="price">Price:</label>
+      <input
+        id="price"
+        type="number"
+        formControlName="price"
+        [class.invalid]="isFieldInvalid('price')"
+      />
+      <div class="error-message" *ngIf="isFieldInvalid('price')">
+        Price is required and must be greater than 0
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="category">Category:</label>
+      <input
+        id="category"
+        type="text"
+        formControlName="category"
+        [class.invalid]="isFieldInvalid('category')"
+      />
+      <div class="error-message" *ngIf="isFieldInvalid('category')">
+        Category is required
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description:</label>
+      <textarea id="description" formControlName="description"></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" [disabled]="productForm.invalid">
+        {{ isEditing ? "Update" : "Add" }} Product
+      </button>
+      <button type="button" (click)="resetForm()" *ngIf="isEditing">
+        Cancel
+      </button>
+    </div>
+  </form>
+
+  <table class="product-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Category</th>
+        <th>Description</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let product of products">
+        <td>{{ product.name }}</td>
+        <td>{{ product.price | currency }}</td>
+        <td>{{ product.category }}</td>
+        <td>{{ product.description }}</td>
+        <td class="actions">
+          <button (click)="editProduct(product)">Edit</button>
+          <button (click)="deleteProduct(product.id!)" class="delete">
+            Delete
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <app-product-chart [products]="products"></app-product-chart>
+</div>
