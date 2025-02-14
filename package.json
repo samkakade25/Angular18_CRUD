@@ -18,6 +18,7 @@
     "@angular/platform-browser": "^19.1.0",
     "@angular/platform-browser-dynamic": "^19.1.0",
     "@angular/router": "^19.1.0",
+    "@swimlane/ngx-charts": "^22.0.0-alpha.0",
     "@types/chart.js": "^2.9.41",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.7",

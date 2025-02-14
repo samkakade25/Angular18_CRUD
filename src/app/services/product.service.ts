@@ -6,53 +6,49 @@ import { Product } from '../models/product.model';
   providedIn: 'root',
 })
 export class ProductService {
-  private products: Product[] = [];
-  private productsSubject = new BehaviorSubject<Product[]>([]);
+  private readonly STORAGE_KEY = 'products';
+  private products$ = new BehaviorSubject<Product[]>([]);
+  private currentId = 1;
 
   constructor() {
-    // Initialize with some sample data
-    this.products = [
-      {
-        id: 1,
-        name: 'Laptop',
-        price: 999.99,
-        category: 'Electronics',
-        description: 'High-performance laptop',
-      },
-      {
-        id: 2,
-        name: 'Desk Chair',
-        price: 199.99,
-        category: 'Furniture',
-        description: 'Ergonomic office chair',
-      },
-    ];
-    this.productsSubject.next(this.products);
+    this.loadProductsFromStorage();
+  }
+
+  private loadProductsFromStorage(): void {
+    const savedProducts = localStorage.getItem(this.STORAGE_KEY);
+    if (savedProducts) {
+      const products = JSON.parse(savedProducts);
+      this.currentId = Math.max(...products.map((p: Product) => p.id || 0)) + 1;
+      this.products$.next(products);
+    }
+  }
+
+  private saveToStorage(products: Product[]): void {
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(products));
+    this.products$.next(products);
   }
 
   getProducts(): Observable<Product[]> {
-    return this.productsSubject.asObservable();
+    return this.products$.asObservable();
   }
 
   addProduct(product: Product): void {
-    const newProduct = {
-      ...product,
-      id: this.products.length + 1,
-    };
-    this.products.push(newProduct);
-    this.productsSubject.next(this.products);
+    const products = this.products$.value;
+    const newProduct = { ...product, id: this.currentId++ };
+    this.saveToStorage([...products, newProduct]);
   }
 
-  updateProduct(product: Product): void {
-    const index = this.products.findIndex((p) => p.id === product.id);
+  updateProduct(updatedProduct: Product): void {
+    const products = this.products$.value;
+    const index = products.findIndex((p) => p.id === updatedProduct.id);
     if (index !== -1) {
-      this.products[index] = product;
-      this.productsSubject.next(this.products);
+      products[index] = updatedProduct;
+      this.saveToStorage([...products]);
     }
   }
 
   deleteProduct(id: number): void {
-    this.products = this.products.filter((p) => p.id !== id);
-    this.productsSubject.next(this.products);
+    const products = this.products$.value;
+    this.saveToStorage(products.filter((p) => p.id !== id));
   }
 }

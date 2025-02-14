@@ -1,0 +1,31 @@
+<div class="chart-container">
+  <div class="chart-header">
+    <h2>Product Analytics</h2>
+  </div>
+
+  @if (chartData.length > 0) {
+  <ngx-charts-bar-vertical-2d
+    [view]="view"
+    [scheme]="colorScheme"
+    [results]="chartData"
+    [gradient]="gradient"
+    [xAxis]="showXAxis"
+    [yAxis]="showYAxis"
+    [legend]="showLegend"
+    [showXAxisLabel]="showXAxisLabel"
+    [showYAxisLabel]="showYAxisLabel"
+    [xAxisLabel]="xAxisLabel"
+    [yAxisLabel]="yAxisLabel"
+    [legendTitle]="legendTitle"
+    [animations]="animations"
+    (select)="onSelect($event)"
+  >
+  </ngx-charts-bar-vertical-2d>
+  } @else {
+  <div class="no-data">No data available to display</div>
+  } @if (products.length > 5) {
+  <div class="chart-footer">
+    Showing top 5 products out of {{ products.length }} total products
+  </div>
+  }
+</div>

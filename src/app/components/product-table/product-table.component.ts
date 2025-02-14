@@ -9,33 +9,51 @@ import { ProductService } from '../../services/product.service';
 import { Product } from '../../models/product.model';
 import { CommonModule } from '@angular/common';
 import { ProductChartComponent } from '../product-chart/product-chart.component';
+import { ProductChartNgxComponent } from '../product-chart-ngx/product-chart-ngx.component';
 
 @Component({
   selector: 'app-product-table',
   templateUrl: './product-table.component.html',
   styleUrls: ['./product-table.component.css'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ProductChartComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    ProductChartComponent,
+    ProductChartNgxComponent,
+  ],
 })
 export class ProductTableComponent implements OnInit {
   products: Product[] = [];
   productForm: FormGroup;
   isEditing = false;
   editingId: number | null = null;
+  isLoading = false;
+  error: string | null = null;
 
   constructor(private productService: ProductService, private fb: FormBuilder) {
     this.productForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       price: ['', [Validators.required, Validators.min(0)]],
+      quantity: ['', [Validators.required, Validators.min(0)]],
       category: ['', Validators.required],
       description: [''],
     });
   }
 
   ngOnInit(): void {
-    this.productService
-      .getProducts()
-      .subscribe((products) => (this.products = products));
+    this.isLoading = true;
+    this.productService.getProducts().subscribe({
+      next: (products) => {
+        this.products = products;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        this.error = 'Failed to load products';
+        this.isLoading = false;
+        console.error('Error loading products:', err);
+      },
+    });
   }
 
   onSubmit(): void {
@@ -59,6 +77,7 @@ export class ProductTableComponent implements OnInit {
     this.productForm.patchValue({
       name: product.name,
       price: product.price,
+      quantity: product.quantity,
       category: product.category,
       description: product.description,
     });
